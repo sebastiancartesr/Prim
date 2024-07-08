@@ -8,6 +8,9 @@ import org.json.JSONTokener;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class MapHelper {
     public static final String MAP_ATT532 = "att532.dat";
@@ -44,5 +47,54 @@ public class MapHelper {
         } catch (IOException | JSONException e) {
             throw new IllegalArgumentException("El archivo al intentar leer el archivo.");
         }
+    }
+    public static String generarDot(int[] padres) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("digraph Arbol {\n");
+
+        int n = padres.length;
+        for (int i = 0; i < n; i++) {
+            List<Integer> hijos = new ArrayList<>();
+            for (int j = 0; j < n; j++) {
+                if (padres[j] == i) {
+                    hijos.add(j);
+                }
+            }
+            if (!hijos.isEmpty()) {
+                sb.append(i)
+                        .append(" -> {")
+                        .append(String.join(", ", hijos.stream().map(String::valueOf).toArray(String[]::new)))
+                        .append("};\n");
+            } else {
+                sb.append(i).append(" -> {};\n");
+            }
+        }
+
+        sb.append("}");
+        return sb.toString();
+    }
+    public static String generarDotOrden(int[] padres,int[][] distancesMap) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("digraph Arbol {\n");
+
+        List<String> edges = new ArrayList<>();
+        int n = padres.length;
+        for (int i = 1; i < n; i++) {
+            int padre = padres[i];
+            if (padre != -1) {
+                edges.add(padre + " -> " + i + " [label=\"" + distancesMap[padre][i] + "\"]\n");
+            }
+        }
+
+        // Ordenamos las aristas alfabéticamente
+        Collections.sort(edges);
+
+        // Añadimos las aristas ordenadas al StringBuilder
+        for (String edge : edges) {
+            sb.append(edge);
+        }
+
+        sb.append("}");
+        return sb.toString();
     }
 }
