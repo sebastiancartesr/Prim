@@ -5,9 +5,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONTokener;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
+import java.awt.*;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -96,5 +95,44 @@ public class MapHelper {
 
         sb.append("}");
         return sb.toString();
+    }
+    public static void execDot(String dotInput) throws IOException, InterruptedException {
+        // Comando para ejecutar Graphviz dot
+        String[] cmd = {"dot", "-Tpng", "-ooutput.png"};
+
+        // Crear un proceso con el comando
+        ProcessBuilder processBuilder = new ProcessBuilder(cmd);
+        Process process = processBuilder.start();
+
+        // Escribir el contenido DOT en la entrada estándar del proceso dot
+        try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()))) {
+            writer.write(dotInput);
+            writer.flush();
+        }
+
+        // Esperar a que el proceso termine
+        int exitCode = process.waitFor();
+        if (exitCode != 0) {
+            throw new RuntimeException("dot command failed with exit code " + exitCode);
+        }
+        openImage("output.png");
+    }
+    private static void openImage(String filePath) throws IOException {
+        File imageFile = new File(filePath);
+        if (!imageFile.exists()) {
+            throw new FileNotFoundException("Image file not found: " + filePath);
+        }
+
+        // Abrir la imagen con el visor de imágenes predeterminado
+        if (Desktop.isDesktopSupported()) {
+            Desktop desktop = Desktop.getDesktop();
+            if (desktop.isSupported(Desktop.Action.OPEN)) {
+                desktop.open(imageFile);
+            } else {
+                throw new UnsupportedOperationException("Open action is not supported on this desktop");
+            }
+        } else {
+            throw new UnsupportedOperationException("Desktop is not supported on this system");
+        }
     }
 }
