@@ -52,7 +52,7 @@ public class MapHelper {
         sb.append("digraph Arbol {\n");
 
         int n = padres.length;
-        for (int i = 0; i < n; i++) {
+        for (int i = 1; i < n; i++) {
             List<Integer> hijos = new ArrayList<>();
             for (int j = 0; j < n; j++) {
                 if (padres[j] == i) {

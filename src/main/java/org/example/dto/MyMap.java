@@ -114,16 +114,14 @@ public class MyMap {
     }
 
 
-    public int[] primBeta(){
+    public int[] primBeta() {
         int ciudades = distancesMap.length;
         boolean[] visited = new boolean[ciudades];
         int[] menorDistancia = new int[ciudades];
         int[] padres = new int[ciudades];
-        // lleno el arreglo con valores mas altos para poder llenarlo con los menores
+
         Arrays.fill(menorDistancia, Integer.MAX_VALUE);
-        // lleno los padres con -1 para que esten como no visitados
         Arrays.fill(padres, -1);
-        // creo la cola de prioridades para poder ordenarlos en base a la distancia
         PriorityQueue<Pair> pq = new PriorityQueue<>(Comparator.comparingInt(p -> p.distance));
 
         // Se asume que el nodo 1 es el punto de inicio
@@ -131,31 +129,24 @@ public class MyMap {
         menorDistancia[1] = 0;
 
         while (!pq.isEmpty()) {
-            // Extraemos el nodo con la menor distancia de la cola de prioridad
             int u = pq.poll().node;
-            // Si el nodo ya ha sido visitado, continuamos con el siguiente
             if (visited[u]) continue;
-            // Marcamos el nodo como visitado
             visited[u] = true;
-            // Recorremos todos los nodos adyacentes al nodo u
-            for (int v = 0; v < ciudades; v++) {
-                // Si v es el mismo nodo u o si el nodo v ya ha sido visitado, lo saltamos
+
+            for (int v = 1; v < ciudades; v++) { // Note: start from 1 to avoid node 0
                 if (v == u || visited[v]) continue;
-                // Obtenemos el peso (distancia) de la arista entre u y v
                 int weight = distancesMap[u][v];
-                // Si encontramos una distancia menor para llegar a v, actualizamos
                 if (weight < menorDistancia[v]) {
-                    // Actualizamos la distancia mínima para el nodo v
                     menorDistancia[v] = weight;
-                    // Añadimos el nodo v a la cola de prioridad con la nueva distancia
                     pq.add(new Pair(weight, v));
-                    // Actualizamos el padre del nodo v al nodo u
                     padres[v] = u;
                 }
             }
         }
         return padres;
     }
+
+
     public int calcularLargo(int[] padres) {
         int largo = 0;
         for (int i = 0; i < padres.length; i++) {
